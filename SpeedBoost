@@ -1,0 +1,94 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class SpeedBoost : MonoBehaviour
+{
+    private bool moving;
+    private int currentDirection; // 1: facing right; -1 facing left;
+
+    private float speed;
+    private float boostTimer;
+    private bool boosting;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        moving = false;
+        currentDirection = 1;
+
+        speed = 5;
+        boostTimer = 0;
+        boosting = false;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            HorizontalMove(-1);
+        }
+        else if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            HorizontalMove(1);
+        }
+        else if (Input.GetKeyUp(KeyCode.LeftArrow))
+        {
+            HorizontalStay();
+        }
+        else if (Input.GetKeyUp(KeyCode.RightArrow))
+        {
+            HorizontalStay();
+        }
+
+        if (moving)
+        {
+            this.transform.Translate(new Vector3(Time.deltaTime * speed, 0, 0));
+        }
+
+        if (boosting)
+        {
+            boostTimer += Time.deltaTime;
+            if (boostTimer >= 3)
+            {
+                speed = 5;
+                boostTimer = 0;
+                boosting = false;
+            }
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.tag == "SpeedBoost")
+        {
+            boosting = true;
+            speed = 10;
+            Destroy(other.gameObject);
+        }
+    }
+
+    public void HorizontalMove(int direction)
+    {
+        moving = true;
+
+        //move right
+        if (currentDirection < 0 && direction > 0)
+        {
+            currentDirection = 1;
+            this.transform.rotation = new Quaternion(0, 0, 0, 0);
+        }
+        //move left
+        else if (currentDirection > 0 && direction < 0)
+        {
+            currentDirection = -1;
+            this.transform.rotation = new Quaternion(0, 180, 0, 0);
+        }
+    }
+
+    public void HorizontalStay()
+    {
+        moving = false;
+    }
+}
