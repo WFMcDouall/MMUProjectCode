@@ -1,0 +1,63 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class InvincibleTime : MonoBehaviour
+{
+    public int MaxHP;
+    public int CurrentHP;
+
+    public PlayerController player;
+
+    public float invincibilityLength;
+    private float invincibilityTimer;
+
+    private bool invincible;
+
+    void Start()
+    {
+        CurrentHP = MaxHP;
+
+        player = FindObjectOfType<PlayerController>();
+
+        invincibilityTimer = 0;
+        invincible = false;
+    }
+
+    void Update()
+    {
+        invincibilityTimer += Time.deltaTime;
+        if (invincible == true && invincibilityTimer >= 5)
+        {
+            invincible = false;
+            invincibilityTimer -= Time.deltaTime;
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.tag == "Invincible")
+        {
+            invincible = true;
+            invincibilityTimer = 0;
+        }
+    }
+    public void hurtPlayer(int PlayerDamage)
+    {
+        // if invincibility effect has worn off, take damage
+        if (invincibilityTimer >= 5)
+        {
+            CurrentHP -= PlayerDamage;
+            invincibilityTimer = invincibilityLength;
+        }
+    }
+    public void healPlayer(int HealDamage)
+    {
+        // if invincibility effect has worn off, take damage
+        CurrentHP += HealDamage;
+        if (CurrentHP > MaxHP)
+        {
+            CurrentHP = MaxHP;
+        }
+    }
+}
